@@ -1,0 +1,37 @@
+Opis:
+
+Modelowanym zagadnieniem jest łazik marsjański, którego celem jest dotarcie do wyznaczonego punktu omijając przy tym przeszkody.
+Będzie składać się z:
+ - komputera pokładowy
+ - modułu komunikacyjnego
+ - kamer monitorujących otoczenie
+ - czujników zbliżeniowych do wykrywania przeszkód w bliskiej odległości
+ - silników elektrycznych po jednym na każde koło 
+
+
+Komponenty:
+    Urządzenia:
+        Silnik(x4):
+            -
+        Kamera(x2):
+            -
+        Czujniki zbliżeniowe(x6):
+            -
+        Antena:
+            -
+    
+    Magistrala komunikacyjna
+
+    
+    Procesory:
+        Procesor komputera pokładowego:
+            - 
+        Procesor modułu kominikacyjnego:
+            -
+        Procesor modułu sterowania:
+            -
+        Procesor przetwarzania obrazu:
+            -   
+
+    Procesy:
+        Proces 

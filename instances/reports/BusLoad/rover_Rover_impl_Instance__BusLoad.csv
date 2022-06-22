@@ -1,0 +1,61 @@
+Bus load analysis of Rover_impl_Instance
+
+
+"Physical Bus","Capacity (KB/s)","Budget (KB/s)","Required Budget (KB/s)","Actual (KB/s)"
+"can","0.0","0.0","0.0","0.0"
+
+"Bus can has data overhead of 0 bytes"
+"Bound Virtual Bus/Connection","Capacity (KB/s)","Budget (KB/s)","Required Budget (KB/s)","Actual (KB/s)"
+"cameras[1].image --> map_evaluator_process.map_evaluator_task.images[1]","","0.0","","0.0"
+"cameras[2].image --> map_evaluator_process.map_evaluator_task.images[2]","","0.0","","0.0"
+"distance_sensors[1].distance --> map_evaluator_process.map_evaluator_task.distances[1]","","0.0","","0.0"
+"distance_sensors[2].distance --> map_evaluator_process.map_evaluator_task.distances[2]","","0.0","","0.0"
+"distance_sensors[3].distance --> map_evaluator_process.map_evaluator_task.distances[3]","","0.0","","0.0"
+"distance_sensors[4].distance --> map_evaluator_process.map_evaluator_task.distances[4]","","0.0","","0.0"
+"distance_sensors[5].distance --> map_evaluator_process.map_evaluator_task.distances[5]","","0.0","","0.0"
+"distance_sensors[6].distance --> map_evaluator_process.map_evaluator_task.distances[6]","","0.0","","0.0"
+"steering_process.steering_task.state[1] --> engines[1].state","","0.0","","0.0"
+"steering_process.steering_task.state[2] --> engines[2].state","","0.0","","0.0"
+"steering_process.steering_task.state[3] --> engines[3].state","","0.0","","0.0"
+"steering_process.steering_task.state[4] --> engines[4].state","","0.0","","0.0"
+
+"WARNING: Bus can has no capacity"
+"WARNING: Bus can has no bandwidth budget"
+
+"Connection cameras[1].image --> map_evaluator_process.map_evaluator_task.images[1] bound to can"
+"WARNING: Connection cameras[1].image --> map_evaluator_process.map_evaluator_task.images[1] has no bandwidth budget"
+
+"Connection cameras[2].image --> map_evaluator_process.map_evaluator_task.images[2] bound to can"
+"WARNING: Connection cameras[2].image --> map_evaluator_process.map_evaluator_task.images[2] has no bandwidth budget"
+
+"Connection distance_sensors[1].distance --> map_evaluator_process.map_evaluator_task.distances[1] bound to can"
+"WARNING: Connection distance_sensors[1].distance --> map_evaluator_process.map_evaluator_task.distances[1] has no bandwidth budget"
+
+"Connection distance_sensors[2].distance --> map_evaluator_process.map_evaluator_task.distances[2] bound to can"
+"WARNING: Connection distance_sensors[2].distance --> map_evaluator_process.map_evaluator_task.distances[2] has no bandwidth budget"
+
+"Connection distance_sensors[3].distance --> map_evaluator_process.map_evaluator_task.distances[3] bound to can"
+"WARNING: Connection distance_sensors[3].distance --> map_evaluator_process.map_evaluator_task.distances[3] has no bandwidth budget"
+
+"Connection distance_sensors[4].distance --> map_evaluator_process.map_evaluator_task.distances[4] bound to can"
+"WARNING: Connection distance_sensors[4].distance --> map_evaluator_process.map_evaluator_task.distances[4] has no bandwidth budget"
+
+"Connection distance_sensors[5].distance --> map_evaluator_process.map_evaluator_task.distances[5] bound to can"
+"WARNING: Connection distance_sensors[5].distance --> map_evaluator_process.map_evaluator_task.distances[5] has no bandwidth budget"
+
+"Connection distance_sensors[6].distance --> map_evaluator_process.map_evaluator_task.distances[6] bound to can"
+"WARNING: Connection distance_sensors[6].distance --> map_evaluator_process.map_evaluator_task.distances[6] has no bandwidth budget"
+
+"Connection steering_process.steering_task.state[1] --> engines[1].state bound to can"
+"WARNING: Connection steering_process.steering_task.state[1] --> engines[1].state has no bandwidth budget"
+
+"Connection steering_process.steering_task.state[2] --> engines[2].state bound to can"
+"WARNING: Connection steering_process.steering_task.state[2] --> engines[2].state has no bandwidth budget"
+
+"Connection steering_process.steering_task.state[3] --> engines[3].state bound to can"
+"WARNING: Connection steering_process.steering_task.state[3] --> engines[3].state has no bandwidth budget"
+
+"Connection steering_process.steering_task.state[4] --> engines[4].state bound to can"
+"WARNING: Connection steering_process.steering_task.state[4] --> engines[4].state has no bandwidth budget"
+
+

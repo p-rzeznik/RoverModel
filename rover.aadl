@@ -1,0 +1,271 @@
+package rover
+public
+-- 4 silniki
+-- sterownik silników
+-- system sterowania
+-- 
+  with Base_Types;
+  with Data_model; 
+
+	data EngineState
+		properties
+			Data_Model::Enumerators => ("Off", "Forward", "Backward");
+	end EngineState;
+
+	data implementation EngineState.impl
+	end EngineState.impl;
+
+	data Pixel
+		properties
+			Data_model::Data_representation => Integer;
+	end Pixel;
+
+
+	data implementation Pixel.impl
+	end Pixel.impl;
+
+	
+	data Image
+	end Image;
+
+	data implementation Image.impl
+		subcomponents		
+			pixels : data Pixel[][];
+	end Image.impl;
+
+		
+	data Position
+	end Position;
+	
+	
+	data implementation Position.impl
+		subcomponents
+			x: data Base_Types::Integer;
+			y: data Base_Types::Integer;	
+	end Position.impl;
+	
+	
+	bus CAN
+	end CAN;
+	
+	device Engine
+		features
+			state: in data port EngineState;
+			can: requires bus access CAN;
+	end Engine;
+	
+	device implementation Engine.impl
+	end Engine.impl;
+	
+	
+	device Camera
+		features
+			image: out data port Image.impl;
+			can: requires bus access CAN;		
+	end Camera;
+	
+	device implementation Camera.impl	
+	end Camera.impl;
+	
+	
+	device DistanceSensor
+		features
+			distance: out data port Base_Types::Integer;
+			can: requires bus access CAN;			
+	end DistanceSensor;
+	
+	device implementation DistanceSensor.impl	
+	end DistanceSensor.impl;
+	
+	
+	device Antena
+		features
+			received_data: out data port Base_Types::Boolean[];
+			can: requires bus access CAN;			
+	end Antena;
+	
+	device implementation Antena.impl
+	end Antena.impl;
+	
+
+	processor MainProcessor
+		features
+			can: requires bus access CAN;
+	end MainProcessor;
+
+	processor SteeringProcessor
+		features
+			can: requires bus access CAN;
+	end SteeringProcessor;
+	
+	-- software
+	
+	thread DataReceivingThread
+		features
+			received_data: in data port Base_Types::Boolean[];
+			destination: out data port Position;
+        properties
+            Dispatch_Protocol => Periodic;
+            Dispatch_Offset =>  2ms;
+            Deadline => 15ms;
+            Period => 20ms;
+            Compute_Execution_Time => 0ms..2ms;		
+	end DataReceivingThread;
+	
+	thread implementation DataReceivingThread.impl
+	end DataReceivingThread.impl;
+	
+	
+	thread SteeringThread
+		features
+			state: out data port EngineState[4];
+			destination: in data port Position;
+			cost_map: in data port Image;
+        properties
+            Dispatch_Protocol => Periodic;
+            Dispatch_Offset =>  2ms;
+            Deadline => 15ms;
+            Period => 20ms;
+            Compute_Execution_Time => 0ms..2ms;	
+	end SteeringThread;
+	
+	thread implementation SteeringThread.impl
+	end SteeringThread.impl;
+	
+	
+	thread MapEvaluatorThread
+		features
+			images: in data port Image[2];
+			distances: in data port Base_Types::Integer[6];
+			cost_map: out data port Image;
+        properties
+            Dispatch_Protocol => Periodic;
+            Dispatch_Offset =>  2ms;
+            Deadline => 15ms;
+            Period => 20ms;
+            Compute_Execution_Time => 0ms..2ms;		
+	end MapEvaluatorThread;
+	
+	thread implementation MapEvaluatorThread.impl
+	end MapEvaluatorThread.impl;
+	
+	
+	thread MainThread
+		features
+			cost_map: in data port Image;
+			cost_map_out: out data port Image;
+        properties
+            Dispatch_Protocol => Periodic;
+            Dispatch_Offset =>  2ms;
+            Deadline => 15ms;
+            Period => 20ms;
+            Compute_Execution_Time => 0ms..2ms;			
+	end MainThread;
+	
+	thread implementation MainThread.impl
+	end MainThread.impl;
+	
+	process SteeringProcess
+		features
+			destination: in data port Position;
+			cost_map: in data port Image;
+			states: out data port EngineState[4];
+			
+	end SteeringProcess;
+	
+	process implementation SteeringProcess.impl
+		subcomponents
+			steering_task: thread SteeringThread.impl;
+		connections
+			destination_conn: port destination-> steering_task.destination;
+			cost_map_conn: port cost_map -> steering_task.cost_map;
+			state_conn: port steering_task.state -> states;
+	end SteeringProcess.impl;
+	
+	process MapEvaluatorProcess
+		features
+			images: in data port Image[2];
+			distances: in data port Base_Types::Integer[6];
+			cost_map: out data port Image;
+	end MapEvaluatorProcess;
+	
+	process implementation MapEvaluatorProcess.impl
+		subcomponents
+			map_evaluator_task: thread MapEvaluatorThread.impl;
+		connections
+			images_conn: port images -> map_evaluator_task.images;
+			distances_conn: port distances -> map_evaluator_task.distances;
+			cost_map_conn: port map_evaluator_task.cost_map -> cost_map;
+	end MapEvaluatorProcess.impl;
+	
+	
+	
+	process MainProcess
+		features
+			cost_map: in data port Image;
+			received_data: in data port Base_Types::Boolean[];
+			cost_map_out: out data port Image;
+			destination: out data port Position;
+	end MainProcess;
+	
+	process implementation MainProcess.impl
+		subcomponents
+			main_task: thread MainThread.impl;
+			data_receiving_task: thread DataReceivingThread.impl;
+		connections
+			cost_map_conn_in: port cost_map -> main_task.cost_map;
+			cost_map_conn_out: port main_task.cost_map_out -> cost_map_out;
+			
+			received_data_conn: port received_data -> data_receiving_task.received_data;
+			destination_conn: port data_receiving_task.destination -> destination;
+	end MainProcess.impl;
+	
+	
+	processor DefaultProcessor
+		features
+			can: requires bus access CAN;
+	end DefaultProcessor;
+	
+	system Rover
+	end Rover;	
+	
+	system implementation Rover.impl
+		subcomponents
+			engines: device Engine.impl[4];
+			cameras: device Camera.impl[2];
+			distance_sensors: device DistanceSensor.impl[6];
+			antena: device Antena.impl;
+			
+			can: bus CAN;
+			
+			main_processor: processor DefaultProcessor;
+			steering_processor: processor DefaultProcessor;
+			
+			main_process: process MainProcess.impl;
+			map_evaluator_process: process MapEvaluatorProcess.impl;
+			steering_process: process SteeringProcess.impl;
+			
+		connections
+			engines_conn: port steering_process.states -> engines.state {Connection_Pattern => ((One_To_One));};
+			cameras_conn: port cameras.image -> map_evaluator_process.images {Connection_Pattern => ((One_To_One));};
+			distance_sensors_conn: port distance_sensors.distance -> map_evaluator_process.distances {Connection_Pattern => ((One_To_One));};
+			antena_conn: port antena.received_data -> main_process.received_data;
+			
+			engines_bus: bus access can -> engines.can {Connection_Pattern => ((One_To_All));};
+			cameras_bus: bus access  cameras.can -> can {Connection_Pattern => ((All_To_One));};
+			distance_sensors_bus: bus access distance_sensors.can -> can  {Connection_Pattern => ((All_To_One));};
+			antena_bus: bus access  antena.can -> can;
+			
+			main_processor_bus: bus access can -> main_processor.can;
+			steering_processor_bus: bus access can -> steering_processor.can;
+			
+		properties
+                Actual_Connection_Binding  => (reference(can)) applies to engines_conn, cameras_conn, distance_sensors_conn, antena_conn;
+                
+                Actual_Processor_Binding => (reference(main_processor)) applies to main_process, map_evaluator_process;
+			    Actual_Processor_Binding => (reference(steering_processor)) applies to steering_process;
+			
+			
+	end Rover.impl;
+	
+end rover;
