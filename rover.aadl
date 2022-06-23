@@ -282,7 +282,7 @@ public
 			steering_processor_bus: bus access can -> steering_processor.can;
 			
 		properties
-            Actual_Connection_Binding  => (reference(can)) applies to engines_conn, cameras_conn, distance_sensors_conn, antena_conn;                
+            Actual_Connection_Binding  => (reference(can)) applies to partial_cost_map_conn, full_cost_map_conn, destination_conn, engines_conn, cameras_conn, distance_sensors_conn, antena_conn;                
             Actual_Processor_Binding => (reference(main_processor)) applies to main_process, map_evaluator_process;
 		    Actual_Processor_Binding => (reference(steering_processor)) applies to steering_process;
 			
