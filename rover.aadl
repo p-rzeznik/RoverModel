@@ -1,9 +1,6 @@
 package rover
 public
--- 4 silniki
--- sterownik silników
--- system sterowania
--- 
+
   with Base_Types;
   with Data_model; 
 
@@ -44,6 +41,24 @@ public
 			y: data Base_Types::Integer;	
 	end Position.impl;
 	
+		data Bit
+		properties
+			 Data_model::Data_representation => Boolean;
+	end Bit;
+	
+	data implementation Bit.impl
+	end Bit.impl;
+	
+	
+	data BitArray
+	end BitArray;
+	
+	data implementation BitArray.impl
+		subcomponents
+			array: data Bit[];
+	end BitArray.impl;
+	
+	
 	
 	bus CAN
 	end CAN;
@@ -80,7 +95,7 @@ public
 	
 	device Antena
 		features
-			received_data: out data port Base_Types::Boolean[];
+			received_data: out data port BitArray;
 			can: requires bus access CAN;			
 	end Antena;
 	
@@ -102,7 +117,7 @@ public
 	
 	thread DataReceivingThread
 		features
-			received_data: in data port Base_Types::Boolean[];
+			received_data: in data port BitArray;
 			destination: out data port Position;
         properties
             Dispatch_Protocol => Periodic;
@@ -203,7 +218,7 @@ public
 	process MainProcess
 		features
 			cost_map: in data port Image;
-			received_data: in data port Base_Types::Boolean[];
+			received_data: in data port BitArray;
 			cost_map_out: out data port Image;
 			destination: out data port Position;
 	end MainProcess;
@@ -246,10 +261,17 @@ public
 			steering_process: process SteeringProcess.impl;
 			
 		connections
+			partial_cost_map_conn: port map_evaluator_process.cost_map -> main_process.cost_map;
+			full_cost_map_conn: port main_process.cost_map_out -> steering_process.cost_map;
+			destination_conn: port main_process.destination -> steering_process.destination;
+			antena_conn: port antena.received_data -> main_process.received_data;
+			
+			
 			engines_conn: port steering_process.states -> engines.state {Connection_Pattern => ((One_To_One));};
 			cameras_conn: port cameras.image -> map_evaluator_process.images {Connection_Pattern => ((One_To_One));};
 			distance_sensors_conn: port distance_sensors.distance -> map_evaluator_process.distances {Connection_Pattern => ((One_To_One));};
-			antena_conn: port antena.received_data -> main_process.received_data;
+			
+			
 			
 			engines_bus: bus access can -> engines.can {Connection_Pattern => ((One_To_All));};
 			cameras_bus: bus access  cameras.can -> can {Connection_Pattern => ((All_To_One));};
@@ -260,10 +282,9 @@ public
 			steering_processor_bus: bus access can -> steering_processor.can;
 			
 		properties
-                Actual_Connection_Binding  => (reference(can)) applies to engines_conn, cameras_conn, distance_sensors_conn, antena_conn;
-                
-                Actual_Processor_Binding => (reference(main_processor)) applies to main_process, map_evaluator_process;
-			    Actual_Processor_Binding => (reference(steering_processor)) applies to steering_process;
+            Actual_Connection_Binding  => (reference(can)) applies to engines_conn, cameras_conn, distance_sensors_conn, antena_conn;                
+            Actual_Processor_Binding => (reference(main_processor)) applies to main_process, map_evaluator_process;
+		    Actual_Processor_Binding => (reference(steering_processor)) applies to steering_process;
 			
 			
 	end Rover.impl;
